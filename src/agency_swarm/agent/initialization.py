@@ -14,7 +14,7 @@ import warnings
 from functools import wraps
 from typing import TYPE_CHECKING, Any
 
-from agents import Agent as BaseAgent, GuardrailFunctionOutput, ModelSettings, RunContextWrapper
+from agents import Agent as BaseAgent, FunctionTool, GuardrailFunctionOutput, ModelSettings, RunContextWrapper
 from agents.models.default_models import get_default_model_settings as get_sdk_default_model_settings
 
 from agency_swarm.agent.attachment_manager import AttachmentManager
@@ -22,6 +22,7 @@ from agency_swarm.agent.constants import FRAMEWORK_DEFAULT_MODEL
 from agency_swarm.agent.file_manager import AgentFileManager
 from agency_swarm.messages.response_input_sanitizer import ensure_store_false_reasoning_encrypted_content
 from agency_swarm.tools import BaseTool, ToolFactory
+from agency_swarm.tools.function_tool_compat import normalize_function_tool
 from agency_swarm.utils.model_utils import REASONING_MODEL_PREFIXES, get_default_settings_model_name
 
 if TYPE_CHECKING:
@@ -164,6 +165,8 @@ def normalize_agent_tool_definitions(kwargs: dict[str, Any]) -> None:
     for i, tool in enumerate(tools_list):
         if isinstance(tool, type) and issubclass(tool, BaseTool):
             tools_list[i] = ToolFactory.adapt_base_tool(tool)
+        elif isinstance(tool, FunctionTool):
+            tools_list[i] = normalize_function_tool(tool)
 
 
 def apply_framework_defaults(kwargs: dict[str, Any]) -> None:

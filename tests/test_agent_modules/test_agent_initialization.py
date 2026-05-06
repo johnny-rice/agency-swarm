@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
-from agents import FunctionTool, ModelSettings, StopAtTools, Tool, WebSearchTool
+from agents import FunctionTool, ModelSettings, StopAtTools, Tool, WebSearchTool, function_tool as sdk_function_tool
 from agents.agent_output import AgentOutputSchemaBase
 from agents.handoffs import Handoff as SDKHandoff
 from agents.items import ModelResponse, TResponseInputItem, TResponseStreamEvent
@@ -502,6 +502,21 @@ def test_agent_initialization_adapts_basetool_type():
 
     assert len(agent.tools) == 1
     assert isinstance(agent.tools[0], FunctionTool)
+
+
+@pytest.mark.asyncio
+async def test_agent_initialization_normalizes_direct_sdk_function_tool_manual_invocation() -> None:
+    """Direct SDK FunctionTool inputs should support legacy manual invocation."""
+
+    @sdk_function_tool
+    def echo_name(name: str) -> str:
+        return name
+
+    agent = Agent(name="SdkTool", instructions="Test", tools=[echo_name])
+
+    result = await agent.tools[0].on_invoke_tool(None, '{"name": "Ada"}')
+
+    assert result == "Ada"
 
 
 def test_agent_initialization_web_search_source_include_behavior() -> None:

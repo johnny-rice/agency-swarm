@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, get_args, get_origin
 from agents import FunctionTool, Tool
 
 from agency_swarm.tools import BaseTool, ToolFactory, validate_openapi_spec
+from agency_swarm.tools.function_tool_compat import normalize_function_tool
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,9 @@ def add_tool(agent: "Agent", tool: Tool) -> None:
     tool_types = _runtime_tool_types()
     if not isinstance(tool, tool_types):
         raise TypeError(f"Expected an instance of Tool, got {type(tool)}")
+
+    if isinstance(tool, FunctionTool):
+        tool = normalize_function_tool(tool)
 
     # Ensure FunctionTools get one-call guard if needed
     _attach_one_call_guard(tool, agent)

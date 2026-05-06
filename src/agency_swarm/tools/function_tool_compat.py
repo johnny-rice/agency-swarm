@@ -41,7 +41,11 @@ def normalize_function_tool(tool: FunctionTool) -> FunctionTool:
     if getattr(tool, _WRAPPED_ATTR, False):
         return tool
 
-    original_on_invoke_tool = cast(Callable[[Any, str], Awaitable[Any]], tool.on_invoke_tool)
+    original_on_invoke_attr = getattr(tool, "on_invoke_tool", None)
+    if not callable(original_on_invoke_attr):
+        return tool
+
+    original_on_invoke_tool = cast(Callable[[Any, str], Awaitable[Any]], original_on_invoke_attr)
     expects_run_context_wrapper = _expects_run_context_wrapper(original_on_invoke_tool)
 
     @wraps(original_on_invoke_tool)
