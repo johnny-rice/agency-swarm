@@ -229,13 +229,14 @@ def run_stream_with_guardrails(
                                 logger.warning(f"Entering async context for server {server.name}")
                                 await mcp_stack.enter_async_context(server)  # type: ignore[arg-type]
 
-                        with use_runner_compatible_model_settings(agent):
+                        run_config = run_config_override or RunConfig()
+                        with use_runner_compatible_model_settings(agent, run_config) as runner_config:
                             local_result = perform_streamed_run(
                                 agent=agent,
                                 history_for_runner=history_for_runner,
                                 master_context_for_run=master_context_for_run,
                                 hooks_override=hooks_override,
-                                run_config_override=run_config_override,
+                                run_config_override=runner_config,
                                 kwargs=kwargs,
                             )
                             streaming_result = cast(RunResultStreaming, local_result)

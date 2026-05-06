@@ -16,7 +16,14 @@ from contextlib import contextmanager
 from functools import wraps
 from typing import TYPE_CHECKING, Any
 
-from agents import Agent as BaseAgent, FunctionTool, GuardrailFunctionOutput, ModelSettings, RunContextWrapper
+from agents import (
+    Agent as BaseAgent,
+    FunctionTool,
+    GuardrailFunctionOutput,
+    ModelSettings,
+    RunConfig,
+    RunContextWrapper,
+)
 from agents.models.default_models import get_default_model_settings as get_sdk_default_model_settings
 
 from agency_swarm.agent.attachment_manager import AttachmentManager
@@ -112,23 +119,25 @@ def normalize_runner_model_settings(model: Any, settings: ModelSettings) -> Mode
 
 
 @contextmanager
-def use_runner_compatible_model_settings(agent: Any) -> Iterator[None]:
+def use_runner_compatible_model_settings(agent: Any, run_config: RunConfig) -> Iterator[RunConfig]:
     """Temporarily apply SDK-compatible model settings during Runner calls."""
     original_settings = getattr(agent, "model_settings", None)
+    original_run_settings = run_config.model_settings
     if not isinstance(original_settings, ModelSettings):
-        yield
+        yield run_config
         return
 
-    runner_settings = normalize_runner_model_settings(getattr(agent, "model", None), original_settings)
-    if runner_settings is original_settings:
-        yield
-        return
+    effective_settings = original_settings.resolve(original_run_settings)
+    runner_model = run_config.model or getattr(agent, "model", None)
+    runner_settings = normalize_runner_model_settings(runner_model, effective_settings)
 
     agent.model_settings = runner_settings
+    run_config.model_settings = ModelSettings()
     try:
-        yield
+        yield run_config
     finally:
         agent.model_settings = original_settings
+        run_config.model_settings = original_run_settings
 
 
 _DEPRECATED_AGENT_KWARGS: dict[str, str] = {
