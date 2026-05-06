@@ -11,6 +11,8 @@ import inspect
 import logging
 import re
 import warnings
+from collections.abc import Iterator
+from contextlib import contextmanager
 from functools import wraps
 from typing import TYPE_CHECKING, Any
 
@@ -59,13 +61,19 @@ def _replace_reasoning_effort(reasoning: Any, effort: str) -> Any:
     return cloned
 
 
-def normalize_incompatible_model_settings(model_name: str | None, settings: ModelSettings) -> ModelSettings:
+def normalize_incompatible_model_settings(
+    model_name: str | None,
+    settings: ModelSettings,
+    *,
+    omit_unsupported_temperature: bool = False,
+) -> ModelSettings:
     """Downgrade user-specified settings that current model families reject."""
     normalized = settings
     canonical_model_name = model_name.split("/")[-1].lower() if model_name else None
 
     if (
-        normalized.temperature is not None
+        omit_unsupported_temperature
+        and normalized.temperature is not None
         and canonical_model_name
         and canonical_model_name.startswith(REASONING_MODEL_PREFIXES)
     ):
@@ -91,6 +99,36 @@ def normalize_incompatible_model_settings(model_name: str | None, settings: Mode
             return dataclasses.replace(normalized, reasoning=_replace_reasoning_effort(reasoning, fallback_effort))
 
     return normalized
+
+
+def normalize_runner_model_settings(model: Any, settings: ModelSettings) -> ModelSettings:
+    """Return model settings safe to send to the current SDK model."""
+    model_name = get_default_settings_model_name(model)
+    return normalize_incompatible_model_settings(
+        model_name,
+        settings,
+        omit_unsupported_temperature=True,
+    )
+
+
+@contextmanager
+def use_runner_compatible_model_settings(agent: Any) -> Iterator[None]:
+    """Temporarily apply SDK-compatible model settings during Runner calls."""
+    original_settings = getattr(agent, "model_settings", None)
+    if not isinstance(original_settings, ModelSettings):
+        yield
+        return
+
+    runner_settings = normalize_runner_model_settings(getattr(agent, "model", None), original_settings)
+    if runner_settings is original_settings:
+        yield
+        return
+
+    agent.model_settings = runner_settings
+    try:
+        yield
+    finally:
+        agent.model_settings = original_settings
 
 
 _DEPRECATED_AGENT_KWARGS: dict[str, str] = {

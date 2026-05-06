@@ -13,6 +13,7 @@ from openai.types.shared import Reasoning
 from pydantic import BaseModel, Field
 
 from agency_swarm import Agent
+from agency_swarm.agent.initialization import normalize_incompatible_model_settings
 from agency_swarm.integrations.openclaw_model import build_openclaw_responses_model
 
 
@@ -390,18 +391,17 @@ def test_agent_initialization_normalizes_unsupported_gpt5_minimal_reasoning(
         "o4-mini",
     ],
 )
-def test_agent_initialization_omits_temperature_for_models_with_unsupported_temperature(
+def test_runner_settings_omit_temperature_for_models_with_unsupported_temperature(
     model_name: str,
 ) -> None:
     with pytest.warns(UserWarning, match="does not support temperature"):
-        agent = Agent(
-            name="CompatAgent",
-            instructions="Test",
-            model=model_name,
-            model_settings=ModelSettings(temperature=0.3),
+        settings = normalize_incompatible_model_settings(
+            model_name,
+            ModelSettings(temperature=0.3),
+            omit_unsupported_temperature=True,
         )
 
-    assert agent.model_settings.temperature is None
+    assert settings.temperature is None
 
 
 @pytest.mark.parametrize("provider_model", ["openai/gpt-5.4-mini", "azure/gpt-5.4-mini"])
