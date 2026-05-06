@@ -378,7 +378,18 @@ def test_agent_initialization_normalizes_unsupported_gpt5_minimal_reasoning(
     assert agent.model_settings.reasoning.effort == expected_effort
 
 
-@pytest.mark.parametrize("model_name", ["gpt-5.4-mini", "openai/gpt-5.4-mini", "o4-mini"])
+@pytest.mark.parametrize(
+    "model_name",
+    [
+        "gpt-5",
+        "openai/gpt-5",
+        "gpt-5.4-mini",
+        "openai/gpt-5.4-mini",
+        "o1",
+        "o3",
+        "o4-mini",
+    ],
+)
 def test_agent_initialization_omits_temperature_for_models_with_unsupported_temperature(
     model_name: str,
 ) -> None:

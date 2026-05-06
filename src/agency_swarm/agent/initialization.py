@@ -22,7 +22,7 @@ from agency_swarm.agent.constants import FRAMEWORK_DEFAULT_MODEL
 from agency_swarm.agent.file_manager import AgentFileManager
 from agency_swarm.messages.response_input_sanitizer import ensure_store_false_reasoning_encrypted_content
 from agency_swarm.tools import BaseTool, ToolFactory
-from agency_swarm.utils.model_utils import get_default_settings_model_name
+from agency_swarm.utils.model_utils import REASONING_MODEL_PREFIXES, get_default_settings_model_name
 
 if TYPE_CHECKING:
     from agency_swarm.agent.core import Agent
@@ -34,11 +34,6 @@ _GPT_5_MINIMAL_REASONING_FALLBACKS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"^gpt-5(?:\.\d+)?(?:-mini|-nano|-codex)?(?:-\d{4}-\d{2}-\d{2})?$"), "low"),
     (re.compile(r"^gpt-5(?:\.\d+)?-pro(?:-\d{4}-\d{2}-\d{2})?$"), "medium"),
 )
-_TEMPERATURE_UNSUPPORTED_MODEL_PATTERNS: tuple[re.Pattern[str], ...] = (
-    re.compile(r"^gpt-5\.4(?:-(?:mini|nano|pro))?(?:-\d{4}-\d{2}-\d{2})?$"),
-    re.compile(r"^o4-mini(?:-\d{4}-\d{2}-\d{2})?$"),
-)
-
 # Agency Swarm defaults applied when the SDK leaves a field unset
 # include_usage=True enables streaming usage tracking for LiteLLM models
 _FRAMEWORK_DEFAULT_MODEL_SETTINGS = ModelSettings(truncation="auto", include_usage=True)
@@ -71,7 +66,7 @@ def normalize_incompatible_model_settings(model_name: str | None, settings: Mode
     if (
         normalized.temperature is not None
         and canonical_model_name
-        and any(pattern.fullmatch(canonical_model_name) for pattern in _TEMPERATURE_UNSUPPORTED_MODEL_PATTERNS)
+        and canonical_model_name.startswith(REASONING_MODEL_PREFIXES)
     ):
         warnings.warn(
             f"{canonical_model_name or model_name} does not support temperature; omitting the explicit value.",
