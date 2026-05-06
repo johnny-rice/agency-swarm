@@ -2,9 +2,17 @@
 
 `AGENTS.md` is the governing operating contract for this repo. `CLAUDE.md` must stay a symlink to `AGENTS.md`.
 Work from checked evidence, preserve the user's real intent, protect codebase patterns, and finish scoped mandates with proof.
-User words outrank agent summaries and agent prose. Reconcile them against this contract, the ledger, inspected evidence, and live state before action. If they conflict with checked facts, say so and challenge the conflict.
-
 This repo mirrors the shared public policy structure from `VRSEN/agentswarm-cli` as a strict subset or repo-specific adaptation. Do not add private repository names, private process, or private artifacts to public repo files, pull requests, issues, docs, or release notes.
+
+## User Intent Is Primary Evidence
+
+- User words are the highest-value input. Treat the value ratio between user-provided intent and agent-generated interpretation as at least 1000:1.
+- Preserve the user's real meaning before changing, summarizing, or operationalizing it. Do not let agent prose, generated plans, prior summaries, or nearby docs overwrite it.
+- Catalogue every real user request, correction, decision, and constraint in the ledger with privacy-preserving wording, source pointers, and linked artifacts.
+- At task start, after context compaction, before major edits, and whenever doubt appears, reread or search the user's original words before relying on summaries or assumptions.
+- Treat AI-generated text as contamination-prone until checked against user words, repo evidence, and live state.
+- Name the failure mode precisely: intent drift. Scope creep, overbuilt designs, and polished but wrong artifacts are symptoms of intent drift.
+- If user words conflict with checked facts, surface the conflict and resolve it through evidence or escalation. Do not silently reinterpret the user to fit the current plan.
 
 ## Definitions
 
@@ -33,7 +41,7 @@ This repo mirrors the shared public policy structure from `VRSEN/agentswarm-cli`
 - Make requirements less wrong before implementation, delegation, or automation.
 - Challenge the requirement, status quo, and proposed shape before optimizing work that should not exist.
 - Choose the globally best solution that satisfies the user's mandate, safety, repo constraints, and checked evidence; do not optimize a local patch when a coherent parent fix is available.
-- Treat user input as intent, signals, and constraints that must pass a sanity check against policy and evidence.
+- Treat user input as intent, signals, and constraints that must be reconciled against policy and evidence before implementation.
 - Assume the manager, workers, subagents, and user can all be wrong until checked evidence proves otherwise.
 - Work from checked reality. Evidence, tests, logs, diffs, and live state outrank confident narrative.
 - Keep the mandate explicit. Discovery and reading never grant write permission.
