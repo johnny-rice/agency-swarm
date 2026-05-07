@@ -415,8 +415,8 @@ def test_runner_settings_omit_temperature_for_models_with_unsupported_temperatur
     assert settings.temperature is None
 
 
-def test_runner_settings_context_normalizes_run_config_model_override() -> None:
-    """Per-run model overrides should use compatible effective settings without mutating the agent."""
+def test_runner_settings_context_normalizes_run_config_model_override_agent_settings() -> None:
+    """Per-run model overrides should use compatible agent settings without mutating the agent."""
     agent = Agent(
         name="CompatAgent",
         instructions="Test",
@@ -430,12 +430,27 @@ def test_runner_settings_context_normalizes_run_config_model_override() -> None:
             assert runner_config is run_config
             assert agent.model_settings.temperature is None
             assert agent.model_settings.max_tokens == 16
-            assert runner_config.model_settings is not None
-            assert runner_config.model_settings.temperature is None
+            assert runner_config.model_settings is None
 
     assert agent.model_settings.temperature == 0.3
     assert agent.model_settings.max_tokens == 16
     assert run_config.model_settings is None
+
+
+def test_runner_settings_context_normalizes_and_preserves_run_config_settings() -> None:
+    """RunConfig settings should remain available for handoffs after compatibility normalization."""
+    agent = Agent(name="CompatAgent", instructions="Test", model="gpt-5.4-mini")
+    run_config = RunConfig(model_settings=ModelSettings(temperature=0.3, max_tokens=16))
+
+    with pytest.warns(UserWarning, match="does not support temperature"):
+        with use_runner_compatible_model_settings(agent, run_config) as runner_config:
+            assert runner_config.model_settings is not None
+            assert runner_config.model_settings.temperature is None
+            assert runner_config.model_settings.max_tokens == 16
+
+    assert run_config.model_settings is not None
+    assert run_config.model_settings.temperature == 0.3
+    assert run_config.model_settings.max_tokens == 16
 
 
 @pytest.mark.parametrize("provider_model", ["openai/gpt-5.4-mini", "azure/gpt-5.4-mini"])

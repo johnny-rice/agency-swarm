@@ -370,6 +370,22 @@ async def test_tools_folder_preserves_run_context_wrapper_for_custom_function_to
     assert result == "RunContextWrapper"
 
 
+@pytest.mark.asyncio
+async def test_normalized_sdk_function_tool_accepts_manual_run_context_wrapper():
+    """SDK-created FunctionTool instances should accept legacy RunContextWrapper calls."""
+    from agents import function_tool
+
+    @function_tool
+    async def context_name(ctx: RunContextWrapper[dict]) -> str:
+        return type(ctx).__name__
+
+    agent = Agent(name="test", instructions="test", tools=[context_name])
+
+    result = await agent.tools[0].on_invoke_tool(RunContextWrapper(context={}), "{}")
+
+    assert result == "ToolContext"
+
+
 @pytest.mark.parametrize("folder", [None, "/nonexistent/path"])
 def test_tools_folder_missing(folder: str | None):
     """Agent should handle missing or invalid tools_folder gracefully."""

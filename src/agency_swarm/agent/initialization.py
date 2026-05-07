@@ -127,12 +127,16 @@ def use_runner_compatible_model_settings(agent: Any, run_config: RunConfig) -> I
         yield run_config
         return
 
-    effective_settings = original_settings.resolve(original_run_settings)
     runner_model = run_config.model or getattr(agent, "model", None)
-    runner_settings = normalize_runner_model_settings(runner_model, effective_settings)
+    runner_settings = normalize_runner_model_settings(runner_model, original_settings)
+    runner_run_settings = (
+        normalize_runner_model_settings(runner_model, original_run_settings)
+        if isinstance(original_run_settings, ModelSettings)
+        else original_run_settings
+    )
 
     agent.model_settings = runner_settings
-    run_config.model_settings = ModelSettings()
+    run_config.model_settings = runner_run_settings
     try:
         yield run_config
     finally:
