@@ -14,7 +14,6 @@ This directory contains runnable examples demonstrating key features of Agency S
 - **`agent_file_storage.py`** – Vector store creation and FileSearch tool usage
 - **`message_attachments.py`** – File processing and message attachments
 - **`web_search.py`** – Domain-filtered WebSearchTool example with source URL extraction
-- **`image_generation.py`** – Hosted ImageGenerationTool example that saves a generated PNG
 
 ## Agent Communication
 - **`custom_send_message.py`** – Custom SendMessage configurations and patterns

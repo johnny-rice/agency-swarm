@@ -51,43 +51,4 @@ agent = Agent(
 
 Use `include_web_search_sources=False` if you do not want source URLs in web-search tool calls.
 
-### ImageGenerationTool
-
-Use `ImageGenerationTool` when an agent should create or edit images as part of a Responses API workflow. The agent model should be a text-capable mainline model such as `gpt-5.5`, `gpt-5`, or `gpt-4.1`; the hosted tool uses GPT Image models internally.
-
-```python
-import base64
-
-from agency_swarm import Agency, Agent, ImageGenerationTool
-
-agent = Agent(
-    name="ImageGenerator",
-    model="gpt-5.5",
-    instructions="Generate the requested image. Keep any text response short.",
-    tools=[
-        ImageGenerationTool(
-            tool_config={
-                "type": "image_generation",
-                "action": "generate",
-                "size": "1024x1024",
-                "quality": "high",
-                "output_format": "png",
-            }
-        )
-    ],
-)
-
-agency = Agency(agent)
-result = agency.get_response_sync("Draw a clean product mockup of a voice agent app running on an iPhone.")
-
-for item in result.new_items:
-    raw_item = getattr(item, "raw_item", None)
-    if getattr(raw_item, "type", None) == "image_generation_call" and getattr(raw_item, "result", None):
-        with open("output.png", "wb") as f:
-            f.write(base64.b64decode(raw_item.result))
-        break
-```
-
-The Responses API returns generated image bytes as a base64 result on `image_generation_call` output items. Common tool options include `action`, `size`, `quality`, `output_format`, `output_compression`, and `background`. Use `action="generate"` to force new image creation, `action="edit"` when an image is already in context, or `action="auto"` to let the model choose. See the [OpenAI image generation tool guide](https://developers.openai.com/api/docs/guides/tools-image-generation) for current supported models and options.
-
 For detailed documentation and additional configuration options, refer to the [agents SDK tool documentation](https://openai.github.io/openai-agents-python/ref/tool/).
