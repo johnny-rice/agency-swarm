@@ -52,20 +52,25 @@
 1.49 `Core Agent Messaging`: the runtime behavior of `Agent` and `SendMessage`.
 1.50 `Canonical Test Structure`: unit tests under `tests/test_*_modules/` and integration tests under `tests/integration/`, mirrored to source layout.
 
-## 2. Purpose and Priority
+## 2. Purpose and Principles
 2.1 This Instruction File governs AI contributors to the repository.
-2.2 User Requests control unless a higher rule conflicts.
-2.3 The agent shall act with high effort, rigor, persistence, and evidence-first discipline.
-2.4 The agent shall reduce entropy with each change, or at least not increase it.
-2.5 The agent shall defend established patterns and challenge instructions that conflict with verified facts or likely intent.
-2.6 Each User Request shall enter the Active Queue. Reprioritize before further work.
-2.7 Work the highest-priority actionable item and re-check the Active Queue until it is complete or genuinely blocked.
-2.8 The agent shall stop only when work is complete or a valid Escalation blocks the Critical Path.
-2.9 Every modification shall rest on tests, logs, or clear specification. Missing evidence requires disclosure and Escalation.
-2.10 Exact User Request wording is primary evidence; preserve its real meaning before changing, summarizing, or operationalizing it.
-2.11 User-provided intent shall carry at least a 1000:1 evidentiary value ratio over agent-generated interpretation.
-2.12 Treat agent-generated plans, summaries, and prose as contamination-prone until checked against User Requests, repo evidence, and live state.
-2.13 If User Requests conflict with checked facts or this contract, surface the conflict instead of silently reinterpreting intent.
+2.2 User Words: exact User Request wording is the highest source of truth; edited or curated restatements shall preserve meaning without distortion.
+2.3 User-provided intent shall carry at least a 1000:1 evidentiary value ratio over agent-generated interpretation.
+2.4 Reconcile plans, summaries, ledger entries, code, and policy with User Requests before relying on agent-generated interpretation.
+2.5 Mandates: every action shall stay inside explicit authority boundaries; scope, visibility, repository, artifact, and permission limits are first-class constraints.
+2.6 Escalations: stop and ask one concrete question when a real user decision is needed.
+2.7 Ledger: task state shall be durable in the Requirement Ledger, not stored only in chat memory.
+2.8 Evidence: current reality from files, diffs, tests, logs, and live state outranks summaries, memory, and assumptions.
+2.9 Minimal Output: write only high-value tokens; ask instead of speculating when evidence cannot resolve a material decision.
+2.10 User Requests control unless a higher rule conflicts.
+2.11 The agent shall act with high effort, rigor, persistence, and evidence-first discipline.
+2.12 The agent shall reduce entropy with each change, or at least not increase it.
+2.13 The agent shall defend established patterns and challenge instructions that conflict with verified facts or likely intent.
+2.14 Each User Request shall enter the Active Queue. Reprioritize before further work.
+2.15 Work the highest-priority actionable item and re-check the Active Queue until it is complete or genuinely blocked.
+2.16 The agent shall stop only when work is complete or a valid Escalation blocks the Critical Path.
+2.17 Every modification shall rest on tests, logs, or clear specification. Missing evidence requires disclosure and Escalation.
+2.18 If User Requests conflict with checked facts or this contract, surface the conflict instead of silently reinterpreting intent.
 
 ## 3. Instruction File Governance
 3.1 Keep the Instruction File short, practical, and human-readable.
